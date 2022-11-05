@@ -1,0 +1,31 @@
+substitutions:
+  _AR_PROJECT: hsolutions-pub # Artifact Registry Project
+  _AR_LOC: us                 # Artifact Registry Location
+  _AR_REPO: containers        # Artifact Registry Repository
+  _APPLICATION: flutter       # Application / Container Image Name
+
+steps:
+  - id: 'commit id'
+    name: 'alpine'
+    entrypoint: 'sh'
+    args:
+      - '-eEuo'
+      - 'pipefail'
+      - '-c'
+      - |-
+        echo "***********************"
+        echo "Commit SHA: $COMMIT_SHA"
+        echo "***********************"
+
+  - id: 'build docker image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: [
+            'build',
+            '-t', '${_AR_LOC}-docker.pkg.dev/${_AR_PROJECT}/${_AR_REPO}/${_APPLICATION}:$SHORT_SHA',
+            '-t', '${_AR_LOC}-docker.pkg.dev/${_AR_PROJECT}/${_AR_REPO}/${_APPLICATION}:latest',
+            '.'
+    ]
+
+images:
+  - '${_AR_LOC}-docker.pkg.dev/${_AR_PROJECT}/${_AR_REPO}/${_APPLICATION}:latest'
+  - '${_AR_LOC}-docker.pkg.dev/${_AR_PROJECT}/${_AR_REPO}/${_APPLICATION}:$SHORT_SHA'
